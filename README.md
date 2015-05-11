@@ -5,7 +5,7 @@ there's literally no comments in my code lmao
 
 ##compiling
 
-    gcc -std=c11 ~/programming/pbm2braille/pbm2braille.c -o pbm2braille
+    gcc -std=c11 ./pbm2braille.c -o pbm2braille
 
 ##usage
 
