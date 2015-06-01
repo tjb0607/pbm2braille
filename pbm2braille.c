@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 FILE* OpenFile(int argc, char** argv)
 {
         if (argc == 2) {
-                return fopen(argv[1], "r");
+                return fopen(argv[1], "rb");
         } else {
                 return stdin;
         }
