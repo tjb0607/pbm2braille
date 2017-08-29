@@ -1,20 +1,19 @@
+#include <stdio.h>
+#include <stdlib.h>
 //-------------------------------------------------------------------------------------------------
 //OCT2DO:
 //1: DOCUMENT CODE AS IS - ONGOING
 //1a: INITIAL REFORMATING OF TJBS CODE - DONE
-//2: CONVERT TO C++ - ?
-//3: OPTMIZE CODESET - ?
-//4: USE AN IMAGEMAGICK LIBRARY TO ALLOW CONVERSIONS FROM OTHER IMAGE FORMATS - ?
-//5: GRAPHICAL FRONTEND? PROBABLY NOT THAT SEEMS KINDA UNNEEDED YOU KNOW. - DOUBLE ??
+//2: OPTMIZE CODESET - ?
+//3: USE AN IMAGEMAGICK LIBRARY TO ALLOW CONVERSIONS FROM OTHER IMAGE FORMATS - ?
+//4: GET IT TO WORK WITH RANGER
 //-------------------------------------------------------------------------------------------------
 
-#include <stdio.h>
-#include <stdlib.h>
+
 
 //-------------------------------------------------------------------------------------------------
 //PROTOTYPES
 //-------------------------------------------------------------------------------------------------
-
 FILE* OpenFile(int argc, char** argv);
 int GetHeaders(FILE* fp, int* w, int* h);
 char* GetRaw(FILE* fp, int bytes);
@@ -37,9 +36,9 @@ const char* BRAILLE = "⠀";
 int main(int argc, char** argv)
 {
     FILE*   fp = OpenFile(argc, argv);
-    char*   bitmap,
-            rawBraille,
-            braille;
+    char*   bitmap = {""},
+        *   rawBraille,
+        *   braille;
     int     w = 0,
             h = 0,
             wbytes = 0,
@@ -54,7 +53,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    if ( !GetHeaders(fp, &w, &h) ) 
+    if (!GetHeaders(fp, &w, &h)) 
     {
         fputs("Error: not a valid PBM file!\n", stderr);
             
@@ -64,13 +63,12 @@ int main(int argc, char** argv)
     wbytes = Pad(w, 8);
     bytes = wbytes * h;
         
-    if ( (bitmap = GetRaw(fp, bytes)) == NULL ) 
+    if ((bitmap = GetRaw(fp, bytes)) == NULL) 
     {
         fputs("Error: not a valid PBM file!\n", stderr);
         
         return EXIT_FAILURE;
     }
-
     rawBraille = BmpToBraille(bitmap, w, h, wbytes, bytes, &wchars, &hchars);
     braille = RawToUnicodeBraille(rawBraille, wchars, hchars);
 
@@ -99,7 +97,7 @@ FILE* OpenFile(int argc, char** argv)
 
 int GetHeaders(FILE* fp, int* w, int* h)
 {
-    int *num;
+    int* num;
     int word = 0,
         c;
     
@@ -118,7 +116,7 @@ int GetHeaders(FILE* fp, int* w, int* h)
             word++;
         else if (word) 
         {
-            *num = word == 1 ? w : h;
+            num = word == 1 ? w : h;
             *num *= 10;
             *num += c - 48;
         }
