@@ -179,6 +179,9 @@ void PutBraille(char* rawBraille, int row, int col, int wchars)
     rawBraille[(row / 4) * wchars + (col / 2)] |= 1 << pos;
 }
 
+//-------------------------------------------------------------------------------------------------
+
+
 char* BmpToBraille(char* bmp, int w, int h, int wbytes, int bytes, int* wchars, int* hchars)
 {
     int chars,
