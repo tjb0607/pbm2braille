@@ -36,7 +36,7 @@ const char* BRAILLE = "⠀";
 int main(int argc, char** argv)
 {
     FILE*   fp = OpenFile(argc, argv);
-    char*   bitmap = {""},
+    char*   bitmap,
         *   rawBraille,
         *   braille;
     int     w = 0,
