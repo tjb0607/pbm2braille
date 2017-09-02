@@ -130,7 +130,7 @@ void PutBraille(char* rawBraille, int row, int col, int wchars)
 	   6 7
 	*/
 	if (posY != 3) {
-		pos = (posY + 3) * posX;
+		pos = posY + (3 * posX);
 	} else {
 		pos = 6 + posX;
 	}
