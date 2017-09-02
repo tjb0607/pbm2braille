@@ -1,57 +1,66 @@
 #include <stdio.h>
 #include <stdlib.h>
+// this file MUST be saved with utf-8 encoding!
 
+// opens file or returns stdin
 FILE* OpenFile(int argc, char** argv);
+// reads the headers of the pbm file
 int GetHeaders(FILE* fp, int* w, int* h);
+// gets the raw image from the pbm file
 char* GetRaw(FILE* fp, int bytes);
+// divides num / bits and always rounds up
 int Pad(int num, int bits);
+// called by BmpToBraille, puts a 1 bit into the corresponding row/col in the braille image
 void PutBraille(char* rawBraille, int row, int col, int wchars);
+// rearranges the bits and returns a "raw braille" where each byte represents one braille symbol
 char* BmpToBraille(char* bmp, int w, int h, int wbytes, int bytes, int* wchars, int* hchars);
+// converts the raw braille data into a printable UTF-8 string
 char* RawToUnicodeBraille(char* rawBraille, int wchars, int hchars);
 
 const char* BRAILLE = "⠀";
 
 int main(int argc, char** argv)
 {
-	FILE* fp = OpenFile(argc, argv);
-
+	FILE* fp = NULL;
+	int w = 0,		// width of the image
+	    h = 0,		// height of the image
+	    wbytes = 0,		// width in bytes
+	    bytes = 0,		// total number of bytes
+	    wchars,		// width in braille characters
+	    hchars;		// height in braille characters
+	char* bitmap,		// raw bitmap
+	    * rawBraille,	// lower 8 bits of unicode for each braille character
+	    * braille;		// printable string of the image as utf-8 braille symbols
+	
+	fp = OpenFile(argc, argv);
+	
 	if (fp == NULL) {
 		perror("Failed to open stream");
 		return EXIT_FAILURE;
 	}
-
-	int w = 0,
-	    h = 0,
-	    wbytes = 0,
-	    bytes = 0;
-	char* bitmap;
-
+	
 	if ( !GetHeaders(fp, &w, &h) ) {
 		fputs("Error: not a valid PBM file!\n", stderr);
 		return EXIT_FAILURE;
 	}
-
+	
 	wbytes = Pad(w, 8);
 	bytes = wbytes * h;
-
+	
 	if ( (bitmap = GetRaw(fp, bytes)) == NULL ) {
 		fputs("Error: not a valid PBM file!\n", stderr);
 		return EXIT_FAILURE;
 	}
-
-	int wchars,
-	    hchars;
-
-	char* rawBraille = BmpToBraille(bitmap, w, h, wbytes, bytes, &wchars, &hchars);
-	char* braille = RawToUnicodeBraille(rawBraille, wchars, hchars);
-
+	
+	rawBraille = BmpToBraille(bitmap, w, h, wbytes, bytes, &wchars, &hchars);
+	braille = RawToUnicodeBraille(rawBraille, wchars, hchars);
+	
 	printf("%s\n", braille);
-
-
+	
 	free(bitmap);
 	free(rawBraille);
 	free(braille);
-
+	
 	fclose(fp);
 	return 0;
 }
@@ -125,7 +134,7 @@ void PutBraille(char* rawBraille, int row, int col, int wchars)
 	} else {
 		pos = 6 + posX;
 	}
-
+	
 	rawBraille[(row / 4) * wchars + (col / 2)] |= 1 << pos;
 }
 
@@ -134,17 +143,17 @@ char* BmpToBraille(char* bmp, int w, int h, int wbytes, int bytes, int* wchars, 
 	*wchars = Pad(w, 2);
 	*hchars = Pad(h, 4);
 	int chars = *wchars * *hchars;
-
+	
 	char* rawBraille = (char*)malloc(chars);
-
+	
 	for (int i = 0; i < chars; i++) {
 		rawBraille[i] = 0;
 	}
-
+	
 	for (int bytei = 0; bytei < bytes; bytei++) {
 		int bytecol = bytei % wbytes;
 		int row = bytei / wbytes;
-
+	
 		for (int bitcol = 0; bitcol < 8; bitcol++) {
 			if (bmp[bytei] & (char)(1 << bitcol)) {
 				int col = bytecol * 8 + 7 - bitcol;
@@ -152,7 +161,7 @@ char* BmpToBraille(char* bmp, int w, int h, int wbytes, int bytes, int* wchars, 
 			}
 		}
 	}
-
+	
 	return rawBraille;
 }
 
