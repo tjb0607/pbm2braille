@@ -130,7 +130,7 @@ void PutBraille(char* rawBraille, int row, int col, int wchars)
 	   6 7
 	*/
 	if (posY != 3) {
-		pos = posY + 3 * posX;
+		pos = (posY + 3) * posX;
 	} else {
 		pos = 6 + posX;
 	}
@@ -156,7 +156,7 @@ char* BmpToBraille(char* bmp, int w, int h, int wbytes, int bytes, int* wchars, 
 	
 		for (int bitcol = 0; bitcol < 8; bitcol++) {
 			if (bmp[bytei] & (char)(1 << bitcol)) {
-				int col = bytecol * 8 + 7 - bitcol;
+				int col = (bytecol * 8) + 7 - bitcol;
 				PutBraille(rawBraille, row, col, *wchars);
 			}
 		}
@@ -168,7 +168,7 @@ char* BmpToBraille(char* bmp, int w, int h, int wbytes, int bytes, int* wchars, 
 char* RawToUnicodeBraille(char* rawBraille, int wchars, int hchars)
 {
 	int chars = wchars * hchars;
-	int destChars = chars * 3 + hchars;
+	int destChars = (chars * 3) + hchars;
 	char* braille = (char*)malloc(destChars);
 	int strIndex = 0;
 	for (int i = 0; i < chars; i++) {
@@ -176,6 +176,7 @@ char* RawToUnicodeBraille(char* rawBraille, int wchars, int hchars)
 			braille[strIndex] = '\n';
 			strIndex++;
 		}
+		// put last 8 bits of data in utf-8 encoding of braille symbol
 		braille[strIndex] = BRAILLE[0];
 		strIndex++;
 		braille[strIndex] = BRAILLE[1] | ((unsigned char)rawBraille[i] / (1 << 6));
