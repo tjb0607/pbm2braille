@@ -89,10 +89,10 @@ int GetHeaders(FILE* fp, int* w, int* h)
 			}
 		} else if (c == ' ' || c == '\n') {
 			word++;
-		} else if (word) {
+		} else if (word > 0) {
 			int* num = word == 1 ? w : h;
 			*num *= 10;
-			*num += c - 48;
+			*num += c - '0';
 		}
 	}
 	return 1;
