@@ -6,7 +6,7 @@
 FILE* OpenFile(int argc, char** argv);
 // reads the headers of the pbm file
 int GetHeaders(FILE* fp, int* w, int* h);
-// gets the raw image from the pbm file
+// gets the raw image from the pbm file.
 char* GetRaw(FILE* fp, int bytes);
 // divides num / bits and always rounds up
 int Pad(int num, int bits);
@@ -81,7 +81,7 @@ int GetHeaders(FILE* fp, int* w, int* h)
 		int c = getc(fp);
 		if (c == EOF)
 			return 0;
-		if (c == '#') {
+		if (c == '#') {				// ignore comments in file
 			while (c != '\n') {
 				c = getc(fp);
 				if (c == EOF)
@@ -89,8 +89,8 @@ int GetHeaders(FILE* fp, int* w, int* h)
 			}
 		} else if (c == ' ' || c == '\n') {
 			word++;
-		} else if (word > 0) {
-			int* num = (word == 1) ? w : h;
+		} else if (word > 0) {			// 0th word in pbm file is format info, ignore
+			int* num = (word == 1) ? w : h;	// 1st and 2nd words are width and height
 			*num *= 10;
 			*num += c - '0';
 		}
@@ -106,9 +106,8 @@ char* GetRaw(FILE* fp, int bytes)
 		if (c == EOF) {
 			free(bitmap);
 			return NULL;
-		} else {
-			bitmap[i] = c;
 		}
+		bitmap[i] = c;
 	}
 	return bitmap;
 }
@@ -122,20 +121,20 @@ void PutBraille(char* rawBraille, int row, int col, int wchars)
 {
 	int posX = col % 2;
 	int posY = row % 4;
-	int pos = 0;
+	int pos;
 	/*
 	   0 3
 	   1 4
 	   2 5
 	   6 7
 	*/
-	if (posY != 3) {
+	if (posY != 3) {		// handling for top 3 rows
 		pos = posY + (3 * posX);
-	} else {
+	} else {			// handling for bottom row
 		pos = 6 + posX;
 	}
 	
-	rawBraille[(row / 4) * wchars + (col / 2)] |= 1 << pos;
+	rawBraille[(row / 4) * wchars + (col / 2)] |= (1 << pos);
 }
 
 char* BmpToBraille(char* bmp, int w, int h, int wbytes, int bytes, int* wchars, int* hchars)
